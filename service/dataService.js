@@ -1,6 +1,7 @@
 //import db.js
 const db=require('./db')
 
+// import json web token
 const jwt=require('jsonwebtoken')
 
 //create arrow function the argument should be same as the argument posting from f:end
@@ -39,12 +40,19 @@ const login=(mobile,pswd)=>{
         password:pswd
     }).then((result)=>{
         if(result){
+            // generate token
             const token=jwt.sign({
-                CuttentMobile:mobile
+                currentMobile:mobile
             },'gulu')
             return{
                 statusCode:200,
-                message:'login successfull'
+                message:'login successfull',
+                username:result.username,
+                mobileNum:result.mobileNum,
+                address:result.address,
+                token
+
+
             }
         }
         else{

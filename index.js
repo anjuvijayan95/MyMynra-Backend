@@ -7,6 +7,9 @@ const cors=require('cors')
 //import dataService
 const dataService=require('./service/dataService')
 
+// import jswebtoken
+const jwt=require('jsonwebtoken')
+
 //create server
 const server = express()
 
@@ -23,6 +26,29 @@ server.use(cors({
 
 //convert json data to the form that js can understand
 server.use(express.json())
+
+// token varify middleware
+const jwtMidWare=(req,res,next)=>{
+    console.log('inside router specific middleware');
+
+    // get the token from req header from thunder client (access token is a key so give it in square bracket)
+    const token=req.headers['access-token']
+    console.log(token);
+    try{
+        const data=jwt.verify(token,'gulu')
+        console.log(data)
+        console.log('valid token');
+        next()
+    }
+    catch{
+        console.log("invalid token");
+        res.status(401).json({
+            message:'please login'
+        })
+    }
+
+    
+}
 
 
 
@@ -101,7 +127,8 @@ server.post('/add-to-wishlist',(req,res)=>{
 })
 
 
-server.get('/get-wishlist',(req,res)=>{
+server.get('/get-wishlist',jwtMidWare,(req,res)=>{
+    console.log('Inside router sepecified midware')
     console.log('inside index.js resolver-get wishlist');
     dataService.getwishlist()
     .then((result)=>{
